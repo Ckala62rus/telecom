@@ -14,9 +14,13 @@ RUN apk add --no-cache \
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
-RUN pecl update-channels \
-    && pecl install xdebug \
-    && pecl install xhprof
+RUN curl "http://pecl.php.net/get/xhprof-2.3.5.tgz" -fsL -o ./xhprof-2.3.5.tgz && \
+    mkdir /var/xhprof && tar xf ./xhprof-2.3.5.tgz -C /var/xhprof && \
+    cd /var/xhprof/xhprof-2.3.5/extension && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install
 
 RUN docker-php-ext-install \
     pdo \
@@ -24,7 +28,3 @@ RUN docker-php-ext-install \
     intl \
     opcache \
     soap
-
-RUN docker-php-ext-enable \
-    xdebug \
-    xhprof
