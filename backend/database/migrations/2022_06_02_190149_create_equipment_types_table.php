@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name_type');
             $table->string('mask_sn');
+            $table->string('reg');
             $table->timestamps();
         });
     }

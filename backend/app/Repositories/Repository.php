@@ -116,6 +116,18 @@ abstract class Repository
     }
 
     /**
+     * @param int $id
+     * @return Model|null
+     */
+    public function getRecordWithoutException(int $id): ?Model
+    {
+        return $this
+            ->model
+            ->where('id', $id)
+            ->first();
+    }
+
+    /**
      * @param array $ids
      * @return Collection
      */

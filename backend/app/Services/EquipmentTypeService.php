@@ -3,36 +3,37 @@
 namespace App\Services;
 
 use App\Repositories\EquipmentRepository;
+use App\Repositories\EquipmentTypeRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EquipmentTypeService
 {
     /**
-     * @var EquipmentRepository
+     * @var EquipmentTypeRepository
      */
-    protected EquipmentRepository $equipmentRepository;
+    protected EquipmentTypeRepository $equipmentTypeRepository;
 
     /**
      * EquipmentTypeService constructor.
-     * @param EquipmentRepository $equipmentRepository
+     * @param EquipmentTypeRepository $equipmentTypeRepository
      */
     public function __construct(
-        EquipmentRepository $equipmentRepository
+        EquipmentTypeRepository $equipmentTypeRepository
     ) {
-        $this->equipmentRepository = $equipmentRepository;
+        $this->equipmentTypeRepository = $equipmentTypeRepository;
     }
 
     /**
      * Get all equipment types with pagination
-     * @param int $limit
+     * @param array $data
      * @return LengthAwarePaginator
      */
-    public function getAllEquipmentTypeWithPagination(int $limit): LengthAwarePaginator
+    public function getAllEquipmentTypeWithPagination(array $data): LengthAwarePaginator
     {
         return  $this
-            ->equipmentRepository
-            ->paginateAll($limit);
+            ->equipmentTypeRepository
+            ->paginateAll($data['limit']);
     }
 
     /**
@@ -43,7 +44,7 @@ class EquipmentTypeService
     public function getEquipmentById(int $equipmentId): ?Model
     {
         return $this
-            ->equipmentRepository
+            ->equipmentTypeRepository
             ->getRecord($equipmentId);
     }
 
@@ -55,7 +56,7 @@ class EquipmentTypeService
     public function createEquipment(array $data): Model
     {
         return $this
-            ->equipmentRepository
+            ->equipmentTypeRepository
             ->store($data);
     }
 
@@ -68,7 +69,7 @@ class EquipmentTypeService
     public function updateEquipment(array $data, int $id): Model
     {
         return $this
-            ->equipmentRepository
+            ->equipmentTypeRepository
             ->update($data, $id);
     }
 
@@ -80,7 +81,7 @@ class EquipmentTypeService
     public function deleteEquipment(int $id): bool
     {
         return $this
-            ->equipmentRepository
+            ->equipmentTypeRepository
             ->destroy($id);
     }
 }

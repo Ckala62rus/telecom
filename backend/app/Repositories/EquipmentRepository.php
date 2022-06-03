@@ -14,4 +14,14 @@ class EquipmentRepository extends Repository
     {
         $this->model = new Equipment();
     }
+
+    /**
+     * @param Builder $query
+     * @param string $sn
+     * @return Builder
+     */
+    public function getEquipmentBySn(Builder $query, string $sn): Builder
+    {
+        return $query->where('serial_number', $sn);
+    }
 }

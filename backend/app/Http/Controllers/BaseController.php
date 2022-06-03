@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Collection;
 
 class BaseController extends Controller
 {
@@ -38,8 +39,8 @@ class BaseController extends Controller
             'message' => $error,
         ];
 
-        if (!empty($errorMessage)) {
-            $response['data'] = $errorMessage;
+        if (!empty($errorMessages)) {
+            $response['data'] = $errorMessages;
         }
 
         return response()->json($response, $code);

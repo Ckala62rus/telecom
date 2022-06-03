@@ -11,7 +11,7 @@ class Equipment extends Model
 
     protected $fillable = [
         'type_id',
-        'serial_number ',
+        'serial_number',
         'description',
     ];
 }

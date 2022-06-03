@@ -2,24 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Equipment\EquipmentAllRequest;
+use App\Http\Requests\Equipment\EquipmentCreateRequest;
+use App\Http\Resources\Equipment\EquipmentAllResource;
+use App\Services\EquipmentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EquipmentController extends BaseController
 {
+    /**
+     * @var EquipmentService
+     */
+    protected EquipmentService $equipmentService;
 
-    public function index()
+    /**
+     * @param EquipmentService $equipmentService
+     */
+    public function __construct(EquipmentService $equipmentService)
     {
-        return $this->sendResponse([], "index");
+        $this->equipmentService = $equipmentService;
     }
 
-    public function store(Request $request)
+    /**
+     * @param EquipmentAllRequest $request
+     * @return JsonResponse
+     */
+    public function index(EquipmentAllRequest $request): JsonResponse
     {
-        return $this->sendResponse([], "store");
+        $equipment = $this
+            ->equipmentService
+            ->getAllEquipment($request->all());
+
+        return $this->sendResponse([
+            'equipment' => EquipmentAllResource::collection($equipment),
+            'count' => $equipment->total()
+        ], "index");
     }
 
-    public function show($id)
+    /**
+     * Create equipments
+     * @param EquipmentCreateRequest $request
+     * @return JsonResponse
+     */
+    public function store(EquipmentCreateRequest $request): JsonResponse
     {
-        return $this->sendResponse([], "get by id");
+        $out = $this
+            ->equipmentService
+            ->createEquipment(($request->all())['equipments']);
+
+        if (!count($out)) {
+            return $this->sendResponse([], "created equipment success");
+        }
+
+        return $this->sendError("validate fail or exist in db", $out->toArray(), 200);
+    }
+
+    /**
+     * Get equipment by id
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        $equipment = $this
+            ->equipmentService
+            ->getEquipmentById($id);
+
+        if ($equipment) {
+            return $this->sendResponse([
+                'equipment' => EquipmentAllResource::make($equipment)
+            ], "get by id=" . $id);
+        }
+
+        return $this->sendError("equipment by id=" . $id ." not found", [], 404);
     }
 
     public function update(Request $request, $id)
@@ -27,8 +83,21 @@ class EquipmentController extends BaseController
         return $this->sendResponse([], "update by it");
     }
 
-    public function destroy($id)
+    /**
+     * Delete equipment by id
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
     {
-        return $this->sendResponse([], "delete by id");
+        $isDelete = $this
+            ->equipmentService
+            ->deleteEquipmentById($id);
+
+        if ($isDelete) {
+            return $this->sendResponse([], "delete equipment by id=" . $id . " success");
+        }
+
+        return $this->sendError("equipment by id=" . $id . " not found", [], 404);
     }
 }

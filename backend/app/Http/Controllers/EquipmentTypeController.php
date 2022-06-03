@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EquipmentType\EquipmentTypeAllRequest;
+use App\Http\Resources\EquipmentType\EquipmentTypeAllResource;
 use App\Services\EquipmentTypeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,15 +27,18 @@ class EquipmentTypeController extends BaseController
 
     /**
      * Get all equipment types
-     * @param Request $request
+     * @param EquipmentTypeAllRequest $request
      * @return JsonResponse
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(EquipmentTypeAllRequest $request): JsonResponse
     {
         $equipmentTypes = $this
             ->equipmentTypeService
-            ->getAllEquipmentTypeWithPagination($request->limit);
+            ->getAllEquipmentTypeWithPagination($request->all());
 
-        return $this->sendResponse([$equipmentTypes], "equipment-type");
+        return $this->sendResponse([
+            'equipment_types' => EquipmentTypeAllResource::collection($equipmentTypes),
+            'count' => $equipmentTypes->total()
+        ], "equipment-type");
     }
 }

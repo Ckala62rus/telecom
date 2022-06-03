@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Http\Requests\Auth\AuthRegisterRequest;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,10 +33,6 @@ class AuthController extends BaseController
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], "Authentication success");
-//        return response()->json([
-//            'access_token' => $token,
-//            'token_type' => 'Bearer',
-//        ]);
     }
 
     /**
@@ -62,10 +59,6 @@ class AuthController extends BaseController
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], "Authentication success");
-//        return response()->json([
-//            'access_token' => $token,
-//            'token_type' => 'Bearer',
-//        ]);
     }
 
     /**
@@ -73,8 +66,10 @@ class AuthController extends BaseController
      * @param Request $request
      * @return mixed
      */
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
-        return $request->user();
+        return $this->sendResponse([
+            'user' => UserResource::make($request->user())
+        ], "curent auth user");
     }
 }
