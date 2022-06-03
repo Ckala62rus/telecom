@@ -140,4 +140,33 @@ class EquipmentService
             ->equipmentRepository
             ->destroy($id);
     }
+
+    /**
+     * Update equipment by id
+     * @param array $data
+     * @param int $id
+     * @return Model|null
+     */
+    public function updateEquipmentById(array $data, int $id): ?Model
+    {
+        $equipmentTypes = $this
+            ->equipmentTypeRepository
+            ->all();
+
+        $model = null;
+
+        foreach ($equipmentTypes as $type) {
+            if (
+                preg_match('/' . $type['reg'] . '/', $data['serial_number'])
+                && !$this->isExistSerialNumber($data['serial_number'])
+            )
+            {
+                $model = $this
+                    ->equipmentRepository
+                    ->update($data, $id);
+            }
+        }
+
+        return $model;
+    }
 }

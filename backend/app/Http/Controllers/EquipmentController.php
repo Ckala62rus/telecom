@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Equipment\EquipmentAllRequest;
 use App\Http\Requests\Equipment\EquipmentCreateRequest;
+use App\Http\Requests\Equipment\EquipmentUpdateRequest;
 use App\Http\Resources\Equipment\EquipmentAllResource;
 use App\Services\EquipmentService;
 use Illuminate\Http\JsonResponse;
@@ -78,9 +79,25 @@ class EquipmentController extends BaseController
         return $this->sendError("equipment by id=" . $id ." not found", [], 404);
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update equipment by id
+     * @param EquipmentUpdateRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
+    public function update(EquipmentUpdateRequest $request, $id): JsonResponse
     {
-        return $this->sendResponse([], "update by it");
+        $equipment = $this
+            ->equipmentService
+            ->updateEquipmentById($request->all(), $id);
+
+        if (!$equipment) {
+            return $this->sendError("validate fail or exist in db", [], 200);
+        }
+
+        return $this->sendResponse([
+            'equipment' => EquipmentAllResource::make($equipment)
+        ], "update by it");
     }
 
     /**
