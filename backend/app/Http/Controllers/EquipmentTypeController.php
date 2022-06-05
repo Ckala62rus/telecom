@@ -36,9 +36,13 @@ class EquipmentTypeController extends BaseController
             ->equipmentTypeService
             ->getAllEquipmentTypeWithPagination($request->all());
 
-        return $this->sendResponse([
-            'equipment_types' => EquipmentTypeAllResource::collection($equipmentTypes),
-            'count' => $equipmentTypes->total()
-        ], "equipment-type");
+        return response()->json([
+            'data' => EquipmentTypeAllResource::collection($equipmentTypes),
+            'count' => $equipmentTypes->total(),
+        ], JsonResponse::HTTP_OK);
+//        return $this->sendResponse([
+//            'equipment_types' => EquipmentTypeAllResource::collection($equipmentTypes),
+//            'count' => $equipmentTypes->total()
+//        ], "equipment-type");
     }
 }

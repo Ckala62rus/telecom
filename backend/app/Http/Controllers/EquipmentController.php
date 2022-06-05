@@ -35,10 +35,10 @@ class EquipmentController extends BaseController
             ->equipmentService
             ->getAllEquipment($request->all());
 
-        return $this->sendResponse([
-            'equipment' => EquipmentAllResource::collection($equipment),
-            'count' => $equipment->total()
-        ], "index");
+        return response()->json([
+            'data' => EquipmentAllResource::collection($equipment),
+            'count' => $equipment->total(),
+        ], JsonResponse::HTTP_OK);
     }
 
     /**
@@ -50,7 +50,7 @@ class EquipmentController extends BaseController
     {
         $out = $this
             ->equipmentService
-            ->createEquipment(($request->all())['equipments']);
+            ->createEquipment($request->all());
 
         if (!count($out)) {
             return $this->sendResponse([], "created equipment success");
@@ -91,12 +91,12 @@ class EquipmentController extends BaseController
             ->equipmentService
             ->updateEquipmentById($request->all(), $id);
 
-        if (!$equipment) {
-            return $this->sendError("validate fail or exist in db", [], 200);
+        if (count($equipment) > 0) {
+            return $this->sendError("invalid validation by mask", ['equipment' => $equipment], 200);
         }
 
         return $this->sendResponse([
-            'equipment' => EquipmentAllResource::make($equipment)
+            'data' => EquipmentAllResource::make($equipment)
         ], "update by it");
     }
 

@@ -23,7 +23,7 @@ Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/me', [\App\Http\Controllers\AuthController::class, 'me'])->middleware('auth:sanctum');
 
 
-Route::middleware(['auth:sanctum'])->group(function () {
+//Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('equipment-type', \App\Http\Controllers\EquipmentTypeController::class);
     Route::apiResource('equipment', \App\Http\Controllers\EquipmentController::class);
-});
+//});

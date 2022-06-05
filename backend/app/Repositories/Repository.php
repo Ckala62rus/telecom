@@ -67,7 +67,7 @@ abstract class Repository
      * Update record
      *
      * @param array $data
-     * @param $id
+     * @param int $id
      * @return Model
      */
     public function update(array $data, int $id): Model

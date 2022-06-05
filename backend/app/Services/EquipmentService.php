@@ -53,36 +53,65 @@ class EquipmentService
             ->paginateAll($data['limit']);
     }
 
-    public function createEquipment(array $equipments): Collection
+//    public function createEquipment(array $equipments): Collection
+//    {
+//        $equipmentTypes = $this
+//            ->equipmentTypeRepository
+//            ->all();
+//
+//        $createdModels = collect();
+//        $inputModels = collect();
+//
+//        $this->inputSerialNumbers($inputModels, $equipments);
+//
+//        foreach ($equipments as $equipment) {
+//            foreach ($equipmentTypes as $type) {
+//                if (
+//                    preg_match('/' . $type['reg'] . '/', $equipment['serial_number'])
+//                    && !$this->isExistSerialNumber($equipment['serial_number'])
+//                )
+//                {
+//                    $model = $this->equipmentRepository->store([
+//                        'type_id' => $type['id'],
+//                        'serial_number' => $equipment['serial_number'],
+//                        'description' => $equipment['description'] ?? '',
+//                    ]);
+//                    $createdModels->push($model->serial_number);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        return $inputModels->diff($createdModels);
+//    }
+
+    public function createEquipment(array $data): Collection
     {
-        $equipmentTypes = $this
-            ->equipmentTypeRepository
-            ->all();
+        $equipmentType = $this
+            ->equipmentTypeService
+            ->getEquipmentById($data['type_id']);
 
-        $createdModels = collect();
-        $inputModels = collect();
+        $errorModel = collect();
 
-        $this->inputSerialNumbers($inputModels, $equipments);
-
-        foreach ($equipments as $equipment) {
-            foreach ($equipmentTypes as $type) {
-                if (
-                    preg_match('/' . $type['reg'] . '/', $equipment['serial_number'])
-                    && !$this->isExistSerialNumber($equipment['serial_number'])
-                )
+        foreach ($data['equipments'] as $equipment) {
+            if (preg_match('/' . $equipmentType['reg'] . '/', $equipment['serial_number']))
+            {
+                if (!$this->isExistSerialNumber($equipment['serial_number']))
                 {
-                    $model = $this->equipmentRepository->store([
-                        'type_id' => $type['id'],
+                    $this->equipmentRepository->store([
+                        'type_id' => $data['type_id'],
                         'serial_number' => $equipment['serial_number'],
                         'description' => $equipment['description'] ?? '',
                     ]);
-                    $createdModels->push($model->serial_number);
-                    break;
+                } else {
+                    $errorModel->push(['equipment' => $equipment, 'error' => 'serial number exist in database']);
                 }
+            } else {
+                $errorModel->push(['equipment' => $equipment, 'error' => 'invalid reg expression']);
             }
         }
 
-        return $inputModels->diff($createdModels);
+        return $errorModel;
     }
 
     /**
@@ -145,28 +174,32 @@ class EquipmentService
      * Update equipment by id
      * @param array $data
      * @param int $id
-     * @return Model|null
+     * @return Collection
      */
-    public function updateEquipmentById(array $data, int $id): ?Model
+    public function updateEquipmentById(array $data, int $id): Collection
     {
-        $equipmentTypes = $this
+        $equipmentType = $this
             ->equipmentTypeRepository
-            ->all();
+            ->getRecord($data['type_id']);
 
-        $model = null;
+        $errorModel = collect();
 
-        foreach ($equipmentTypes as $type) {
-            if (
-                preg_match('/' . $type['reg'] . '/', $data['serial_number'])
-                && !$this->isExistSerialNumber($data['serial_number'])
-            )
+//        $currentModel = $this
+//            ->equipmentRepository
+//            ->getRecord($id);
+
+            if (preg_match('/' . $equipmentType['reg'] . '/', $data['serial_number']))
             {
-                $model = $this
+                $this
                     ->equipmentRepository
-                    ->update($data, $id);
+                    ->update([
+                        'serial_number' => $data['serial_number'],
+                        'description' => $data['description'] ?? '',
+                    ], $id);
+            } else {
+                $errorModel->push(['equipment' => $data, 'error' => 'invalid reg expression']);
             }
-        }
 
-        return $model;
+        return $errorModel;
     }
 }

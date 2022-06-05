@@ -16,8 +16,8 @@ class EquipmentCreateRequest extends FormRequest
         return [
             'equipments' => 'required|array',
             'equipments.*.serial_number' => 'required|string',
-            'equipments.*.description' => 'sometimes|string',
-            'description' => 'string',
+            'equipments.*.description' => 'nullable|string',
+            'type_id' => 'required|int',
         ];
     }
 }
