@@ -40,9 +40,5 @@ class EquipmentTypeController extends BaseController
             'data' => EquipmentTypeAllResource::collection($equipmentTypes),
             'count' => $equipmentTypes->total(),
         ], JsonResponse::HTTP_OK);
-//        return $this->sendResponse([
-//            'equipment_types' => EquipmentTypeAllResource::collection($equipmentTypes),
-//            'count' => $equipmentTypes->total()
-//        ], "equipment-type");
     }
 }
