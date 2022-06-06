@@ -8,7 +8,6 @@ use App\Http\Requests\Equipment\EquipmentUpdateRequest;
 use App\Http\Resources\Equipment\EquipmentAllResource;
 use App\Services\EquipmentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EquipmentController extends BaseController
 {
