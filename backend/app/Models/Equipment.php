@@ -14,4 +14,9 @@ class Equipment extends Model
         'serial_number',
         'description',
     ];
+
+    public function types()
+    {
+        return $this->hasOne(EquipmentType::class, 'id', 'type_id');
+    }
 }

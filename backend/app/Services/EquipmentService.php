@@ -48,42 +48,60 @@ class EquipmentService
      */
     public function getAllEquipment(array $data): LengthAwarePaginator
     {
-        return $this
-            ->equipmentRepository
-            ->paginateAll($data['limit']);
+        $bySerialNumber = $this->findBySerialNumber($data);
+
+        if (count($bySerialNumber) > 0) {
+            return $bySerialNumber;
+        }
+
+        return $this->findByDescription($data);
     }
 
-//    public function createEquipment(array $equipments): Collection
-//    {
-//        $equipmentTypes = $this
-//            ->equipmentTypeRepository
-//            ->all();
-//
-//        $createdModels = collect();
-//        $inputModels = collect();
-//
-//        $this->inputSerialNumbers($inputModels, $equipments);
-//
-//        foreach ($equipments as $equipment) {
-//            foreach ($equipmentTypes as $type) {
-//                if (
-//                    preg_match('/' . $type['reg'] . '/', $equipment['serial_number'])
-//                    && !$this->isExistSerialNumber($equipment['serial_number'])
-//                )
-//                {
-//                    $model = $this->equipmentRepository->store([
-//                        'type_id' => $type['id'],
-//                        'serial_number' => $equipment['serial_number'],
-//                        'description' => $equipment['description'] ?? '',
-//                    ]);
-//                    $createdModels->push($model->serial_number);
-//                    break;
-//                }
-//            }
-//        }
-//
-//        return $inputModels->diff($createdModels);
-//    }
+    /**
+     * Find By serial Number
+     * @param array $data
+     * @return LengthAwarePaginator
+     */
+    public function findBySerialNumber(array $data): LengthAwarePaginator
+    {
+        $query = $this
+            ->equipmentRepository
+            ->query();
+
+        $query = $this
+            ->equipmentRepository
+            ->getWithEquipmentType($query, 'types');
+
+        if (!empty($data['query'])) {
+            $query = $this
+                ->equipmentRepository
+                ->findBySerialNumber($query, $data['query']);
+        }
+
+        return $query->paginate($data['limit']);
+    }
+
+    /**
+     * Find by description
+     * @param array $data
+     * @return LengthAwarePaginator
+     */
+    public function findByDescription(array $data): LengthAwarePaginator
+    {
+        $query = $this
+            ->equipmentRepository
+            ->query();
+
+        $query = $this
+            ->equipmentRepository
+            ->getWithEquipmentType($query, 'types');
+
+        $query = $this
+            ->equipmentRepository
+            ->findByDescription($query, $data['query']);
+
+        return $query->paginate($data['limit']);
+    }
 
     public function createEquipment(array $data): Collection
     {
@@ -183,10 +201,6 @@ class EquipmentService
             ->getRecord($data['type_id']);
 
         $errorModel = collect();
-
-//        $currentModel = $this
-//            ->equipmentRepository
-//            ->getRecord($id);
 
             if (preg_match('/' . $equipmentType['reg'] . '/', $data['serial_number']))
             {
